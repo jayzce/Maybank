@@ -99,6 +99,17 @@
             background: white;
             box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1);
         }
+        
+        /* Styles to remove up/down arrows from number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
 
         .selection-group {
             display: grid;
@@ -168,7 +179,7 @@
             transform: translateY(0);
         }
 
-        /* Modal Styles - Fixed positioning */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -179,20 +190,19 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
         }
 
         .modal-content {
             background-color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             padding: 40px;
             border-radius: 20px;
             width: 90%;
             max-width: 400px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .modal-content::before {
@@ -274,6 +284,80 @@
                 flex-direction: column;
             }
         }
+        
+        /* Success Modal and Loading Overlay */
+        .checkmark-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #198754;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .checkmark-svg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .checkmark-svg path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 1s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+            stroke: white;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+            font-size: 1.2rem;
+            color: #333;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF1493;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -285,6 +369,18 @@
         <h2 class="form-title">Customer Application Form</h2>
         
         <form id="customerForm">
+            <!-- Agent Dropdown -->
+            <div class="form-group">
+                <label for="agentName">Agent Name</label>
+                <select id="agentName" name="agentName" required>
+                    <option value="" disabled selected>Select an Agent</option>
+                    <option value="Elle">Elle</option>
+                    <option value="Eric">Eric</option>
+                    <option value="Jayrom">Jayrom</option>
+                    <option value="Jhonson">Jhonson</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="customerName">Customer Name</label>
                 <input type="text" id="customerName" name="customerName" required>
@@ -302,7 +398,7 @@
             
             <div class="form-group">
                 <label>Select Product</label>
-                <div class="selection-group">
+                <div class="selection-group" id="productSelection">
                     <div class="selection-item">
                         <input type="radio" id="ezCash" name="product" value="EzCash" required>
                         <label for="ezCash">EzCash</label>
@@ -317,10 +413,34 @@
                     </div>
                 </div>
             </div>
+
+            <!-- EzCash fields, hidden by default -->
+            <div id="ezCashDetails" style="display: none;">
+                <div class="form-group">
+                    <label for="ezCashAccountNumber">Account Number</label>
+                    <input type="number" id="ezCashAccountNumber" name="ezCashAccountNumber">
+                </div>
+                <div class="form-group">
+                    <label for="ezCashFirstName">First Name</label>
+                    <input type="text" id="ezCashFirstName" name="ezCashFirstName">
+                </div>
+                <div class="form-group">
+                    <label for="ezCashMiddleName">Middle Name</label>
+                    <input type="text" id="ezCashMiddleName" name="ezCashMiddleName">
+                </div>
+                <div class="form-group">
+                    <label for="ezCashLastName">Last Name</label>
+                    <input type="text" id="ezCashLastName" name="ezCashLastName">
+                </div>
+                <div class="form-group">
+                    <label for="ezCashAmount">EzCash Amount</label>
+                    <input type="number" id="ezCashAmount" name="ezCashAmount" step="0.01" min="0" placeholder="0.00">
+                </div>
+            </div>
             
             <div class="form-group">
                 <label>Select Installment Period</label>
-                <div class="selection-group">
+                <div class="selection-group" id="installmentSelection">
                     <div class="selection-item">
                         <input type="radio" id="month3" name="installment" value="3" required>
                         <label for="month3">3 Months</label>
@@ -334,10 +454,23 @@
                         <label for="month12">12 Months</label>
                     </div>
                     <div class="selection-item">
+                        <input type="radio" id="month18" name="installment" value="18">
+                        <label for="month18">18 Months</label>
+                    </div>
+                    <div class="selection-item">
                         <input type="radio" id="month24" name="installment" value="24">
                         <label for="month24">24 Months</label>
                     </div>
+                    <div class="selection-item">
+                        <input type="radio" id="month36" name="installment" value="36">
+                        <label for="month36">36 Months</label>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center;">
+                <input type="checkbox" id="amenableCheckbox" name="amenable" value="Yes" style="width: auto; margin-right: 10px;">
+                <label for="amenableCheckbox" style="margin-bottom: 0;">Amenable to lower amount?</label>
             </div>
             
             <button type="submit" class="submit-btn">Submit Application</button>
@@ -350,104 +483,173 @@
             <h3 class="modal-title">Confirm Submission</h3>
             <p class="modal-message">Are you sure you want to submit this application? Please review all information before confirming.</p>
             <div class="modal-buttons">
-                <button class="modal-btn cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn cancel-btn" onclick="closeModal('confirmationModal')">Cancel</button>
                 <button class="modal-btn confirm-btn" onclick="confirmSubmission()">Confirm</button>
             </div>
         </div>
     </div>
+    
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="checkmark-container">
+                <svg class="checkmark-svg" viewBox="0 0 52 52">
+                    <path d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                </svg>
+            </div>
+            <h3 class="modal-title">Submission Successful!</h3>
+            <p class="modal-message">The form is ready for another submission.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" onclick="closeModal('successModal'); clearForm();">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" style="color: #d9534f;">Submission Error</h3>
+            <p class="modal-message">There was an error submitting your application. Please try again.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" onclick="closeModal('errorModal')">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Submitting data...</p>
+    </div>
 
     <script>
-        const form = document.getElementById('customerForm');
-        const modal = document.getElementById('confirmationModal');
-        const cardNumberInput = document.getElementById('cardNumber');
+        // *** IMPORTANT: Replace this URL with your deployed Google Apps Script URL ***
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmCeT067R28ASPbu4-mdCV019w001NbSYYbp-V1HQ71kMlbGR-aBqNtexNwS87STU3ZQ/exec';
 
-        // Format card number input to only accept numbers
+        const form = document.getElementById('customerForm');
+        
+        // Function to handle highlighting of radio button labels
+        function handleRadioLabelHighlight(radio) {
+            const groupName = radio.name;
+            document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                r.closest('.selection-item').querySelector('label').classList.remove('selected-label');
+            });
+            radio.closest('.selection-item').querySelector('label').classList.add('selected-label');
+        }
+
+        // Event listener for product radio buttons
+        document.querySelectorAll('input[name="product"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                handleRadioLabelHighlight(this);
+                const ezCashDetails = document.getElementById('ezCashDetails');
+                const ezCashFields = ezCashDetails.querySelectorAll('input');
+                if (this.id === 'ezCash' && this.checked) {
+                    ezCashDetails.style.display = 'block';
+                    ezCashFields.forEach(field => field.setAttribute('required', ''));
+                } else {
+                    ezCashDetails.style.display = 'none';
+                    ezCashFields.forEach(field => field.removeAttribute('required'));
+                    clearEzCashFields();
+                }
+            });
+        });
+        
+        // Event listener for installment radio buttons
+        document.querySelectorAll('input[name="installment"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                handleRadioLabelHighlight(this);
+            });
+        });
+
+        const cardNumberInput = document.getElementById('cardNumber');
         cardNumberInput.addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '');
         });
 
-        // Form submission handler
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate form
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
             
-            // Show confirmation modal
-            modal.style.display = 'block';
+            document.getElementById('confirmationModal').style.display = 'flex';
         });
 
-        // Close modal function
-        function closeModal() {
-            modal.style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        // Confirm submission function
-        function confirmSubmission() {
-            // Get form data
+        async function confirmSubmission() {
+            closeModal('confirmationModal');
+            showLoadingOverlay();
+
             const formData = new FormData(form);
-            const data = {};
+            formData.append('timestamp', new Date().toISOString());
             
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-            
-            // Add timestamp
-            data.timestamp = new Date().toISOString();
-            
-            // Send to Google Sheets
-            sendToGoogleSheets(data);
+            await sendToGoogleSheets(formData);
         }
 
-        // Function to send data to Google Sheets
+        function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        function clearEzCashFields() {
+            document.getElementById('ezCashAccountNumber').value = '';
+            document.getElementById('ezCashFirstName').value = '';
+            document.getElementById('ezCashMiddleName').value = '';
+            document.getElementById('ezCashLastName').value = '';
+            document.getElementById('ezCashAmount').value = '';
+        }
+        
+        function clearForm() {
+            form.reset();
+            document.querySelectorAll('.selected-label').forEach(label => {
+                label.classList.remove('selected-label');
+            });
+            clearEzCashFields();
+        }
+        
         async function sendToGoogleSheets(data) {
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmCeT067R28ASPbu4-mdCV019w001NbSYYbp-V1HQ71kMlbGR-aBqNtexNwS87STU3ZQ/exec';
-            
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
+                    body: data,
+                    mode: 'no-cors'
                 });
                 
-                if (response.ok) {
-                    // Close modal
-                    closeModal();
-                    
-                    // Reset form first
-                    form.reset();
-                    
-                    // Show success message
-                    alert('Application submitted successfully! The form is ready for another submission.');
-                } else {
-                    throw new Error('Failed to submit data');
-                }
+                hideLoadingOverlay();
+                
+                document.getElementById('successModal').style.display = 'flex';
+                
             } catch (error) {
                 console.error('Error submitting form:', error);
-                alert('There was an error submitting your application. Please try again.');
+                hideLoadingOverlay();
+                document.getElementById('errorModal').style.display = 'flex';
             }
         }
 
-        // Close modal when clicking outside
         window.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
             }
         });
 
-        // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.style.display === 'block') {
-                closeModal();
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        modal.style.display = 'none';
+                    }
+                });
             }
         });
     </script>
 </body>
 </html>
-
-
