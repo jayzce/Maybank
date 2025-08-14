@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maybank Customer Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FF1493, #FFD700);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 180px;
+            height: 60px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .form-title {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FF1493;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1);
+        }
+
+        .selection-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .selection-item {
+            position: relative;
+        }
+
+        .selection-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .selection-item label {
+            display: block;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .selection-item input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #FF1493, #FFD700);
+            color: white;
+            border-color: #FF1493;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.3);
+        }
+
+        .selection-item label:hover {
+            border-color: #FF1493;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #FF1493, #FFD700);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Modal Styles - Fixed positioning */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FF1493, #FFD700);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .modal-message {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #FF1493, #FFD700);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-input {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .selection-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .modal-content {
+                padding: 30px 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="logo-container">
+            <div class="logo">MAYBANK</div>
+        </div>
+        
+        <h2 class="form-title">Customer Application Form</h2>
+        
+        <form id="customerForm">
+            <div class="form-group">
+                <label for="customerName">Customer Name</label>
+                <input type="text" id="customerName" name="customerName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="cardNumber">Last 4 Digits of Credit Card</label>
+                <input type="text" id="cardNumber" name="cardNumber" maxlength="4" pattern="[0-9]{4}" class="card-input" placeholder="••••" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="totalBalance">Total Balance </label>
+                <input type="number" id="totalBalance" name="totalBalance" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Product</label>
+                <div class="selection-group">
+                    <div class="selection-item">
+                        <input type="radio" id="ezCash" name="product" value="EzCash" required>
+                        <label for="ezCash">EzCash</label>
+                    </div>
+                    <div class="selection-item">
+                        <input type="radio" id="ezConvert" name="product" value="EzConvert">
+                        <label for="ezConvert">EzConvert</label>
+                    </div>
+                    <div class="selection-item">
+                        <input type="radio" id="ezTransfer" name="product" value="EzTransfer">
+                        <label for="ezTransfer">EzTransfer</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Installment Period</label>
+                <div class="selection-group">
+                    <div class="selection-item">
+                        <input type="radio" id="month3" name="installment" value="3" required>
+                        <label for="month3">3 Months</label>
+                    </div>
+                    <div class="selection-item">
+                        <input type="radio" id="month6" name="installment" value="6">
+                        <label for="month6">6 Months</label>
+                    </div>
+                    <div class="selection-item">
+                        <input type="radio" id="month12" name="installment" value="12">
+                        <label for="month12">12 Months</label>
+                    </div>
+                    <div class="selection-item">
+                        <input type="radio" id="month24" name="installment" value="24">
+                        <label for="month24">24 Months</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit Application</button>
+        </form>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Confirm Submission</h3>
+            <p class="modal-message">Are you sure you want to submit this application? Please review all information before confirming.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="confirmSubmission()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('customerForm');
+        const modal = document.getElementById('confirmationModal');
+        const cardNumberInput = document.getElementById('cardNumber');
+
+        // Format card number input to only accept numbers
+        cardNumberInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Form submission handler
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Show confirmation modal
+            modal.style.display = 'block';
+        });
+
+        // Close modal function
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Confirm submission function
+        function confirmSubmission() {
+            // Get form data
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Add timestamp
+            data.timestamp = new Date().toISOString();
+            
+            // Send to Google Sheets
+            sendToGoogleSheets(data);
+        }
+
+        // Function to send data to Google Sheets
+        async function sendToGoogleSheets(data) {
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUsUIe9991ieDnZXkTjOU9foRqTKP0p-aMUED3xgwmM15U6PRnx7aQj2yduA71MQTb/exec';
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                
+                if (response.ok) {
+                    // Close modal
+                    closeModal();
+                    
+                    // Reset form first
+                    form.reset();
+                    
+                    // Show success message
+                    alert('Application submitted successfully! The form is ready for another submission.');
+                } else {
+                    throw new Error('Failed to submit data');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('There was an error submitting your application. Please try again.');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
