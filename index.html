@@ -266,6 +266,19 @@
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
         }
+        
+        .promo-checkbox-container {
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 15px;
+            padding-left: 20px; /* Adjust spacing */
+            display: none; /* Initially hidden */
+        }
+        
+        .promo-checkbox-container label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
 
         @media (max-width: 600px) {
             .form-container {
@@ -414,6 +427,12 @@
                 </div>
             </div>
 
+            <!-- Promo Rate Checkbox, shown only for EzCash -->
+            <div class="promo-checkbox-container" id="promoRateCheckboxContainer">
+                <input type="checkbox" id="promoRateCheckbox" name="promoRateCheckbox" value="Yes" style="width: auto; margin-right: 10px;">
+                <label for="promoRateCheckbox" style="margin-bottom: 0;">Available for promotional interest rate?</label>
+            </div>
+
             <!-- EzCash fields, hidden by default -->
             <div id="ezCashDetails" style="display: none;">
                 <div class="form-group">
@@ -542,12 +561,17 @@
             radio.addEventListener('change', function() {
                 handleRadioLabelHighlight(this);
                 const ezCashDetails = document.getElementById('ezCashDetails');
+                const promoCheckboxContainer = document.getElementById('promoRateCheckboxContainer');
                 const ezCashFields = ezCashDetails.querySelectorAll('input');
+                
                 if (this.id === 'ezCash' && this.checked) {
                     ezCashDetails.style.display = 'block';
+                    promoCheckboxContainer.style.display = 'flex'; // Show promo checkbox
                     ezCashFields.forEach(field => field.setAttribute('required', ''));
                 } else {
                     ezCashDetails.style.display = 'none';
+                    promoCheckboxContainer.style.display = 'none'; // Hide promo checkbox
+                    document.getElementById('promoRateCheckbox').checked = false; // Uncheck the box when hidden
                     ezCashFields.forEach(field => field.removeAttribute('required'));
                     clearEzCashFields();
                 }
